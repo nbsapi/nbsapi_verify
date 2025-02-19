@@ -1,0 +1,10 @@
+marks:
+- public
+stages:
+- name: Get Current Api Version
+  request:
+    method: GET
+    url: '{host}/currentversion'
+  response:
+    status_code: 200
+test_name: get_current_api_version_currentversion_get

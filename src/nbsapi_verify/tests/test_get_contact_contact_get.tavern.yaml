@@ -1,0 +1,10 @@
+marks:
+- public
+stages:
+- name: Get Contact
+  request:
+    method: GET
+    url: '{host}/contact'
+  response:
+    status_code: 200
+test_name: get_contact_contact_get

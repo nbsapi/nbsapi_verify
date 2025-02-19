@@ -1,0 +1,28 @@
+marks:
+- auth
+stages:
+- name: Get auth token
+  request:
+    data:
+      password: '{password}'
+      username: '{username}'
+    method: POST
+    url: '{host}/auth/token'
+  response:
+    save:
+      json:
+        token: access_token
+    status_code: 200
+- name: Write Impact Intensity
+  request:
+    headers:
+      Authorization: Bearer {token}
+    json:
+      intensity: low
+    method: POST
+    url: '{host}/v1/api/impacts/impact_intensities'
+  response:
+    status_code:
+    - 200
+    - 409
+test_name: write_impact_intensity_v1_api_impacts_impact_intensities_post

@@ -1,0 +1,26 @@
+marks:
+- auth
+stages:
+- name: Get auth token
+  request:
+    data:
+      password: '{password}'
+      username: '{username}'
+    method: POST
+    url: '{host}/auth/token'
+  response:
+    save:
+      json:
+        token: access_token
+    status_code: 200
+- name: User Details
+  request:
+    headers:
+      Authorization: Bearer {token}
+    method: GET
+    url: '{host}/v1/api/users/{user_id}'
+  response:
+    status_code:
+    - 200
+    - 409
+test_name: user_details_v1_api_users__user_id__get

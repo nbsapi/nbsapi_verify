@@ -1,0 +1,85 @@
+[project]
+name = "nbsapi_verify"
+version = "0.1.0"
+description = "Verify an nbsinfra API implementation"
+readme = "README.md"
+license = {text = "MIT License"}
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.1.8",
+    "tavern>=2.11.0",
+]
+authors = [
+    { name = "Stephan Hügel", email = "urschrei@gmail.com" },
+]
+keywords = ["nbsinfra", "nbsapi"]
+
+[project.urls]
+Homepage = "https://nbsapi.org"
+Repository = "https://github.com/nbsapi/nbsapi_verify"
+Tracker = "https://github.com/nbsapi/nbsapi_verify/issues"
+
+[project.scripts]
+nbsapi_verify = "nbsapi_verify.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+    "--tb=short"
+]
+markers = [
+    "auth: marks tests that require authentication",
+    "public: marks tests that don't require authentication"
+]
+filterwarnings = [
+    "ignore:cannot collect test class 'TestType' because it has a __init__ constructor",
+    "ignore:Can't validate argument 'spatial_index'; can't locate any SQLAlchemy dialect named 'spatial'"
+]
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "N", "D4", "UP", "PL", "TRY", "PERF", "FURB", "RUF", "S", "DTZ"]
+ignore = ["ANN001", "ANN003", "ANN202", "ANN201", "DOC201", "E501", "PLR0904", "PLR0913", "PLR0917", "SLF001", "FIX002", "D400", "D415"]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
