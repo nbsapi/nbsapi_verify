@@ -6,6 +6,8 @@ import click
 import pytest
 import yaml
 
+from .formatting import ResultCapture, format_results
+
 
 class TestType(str, Enum):
     ALL = "all"
@@ -155,7 +157,10 @@ def cli(
     # Prepare pytest arguments
     pytest_args = [
         str(test_dir),
-        "-v",
+        "-q",  # Quiet mode
+        "--tb=no",  # Disable traceback
+        "--no-header",  # Remove header
+        "--no-summary",  # Remove summary
         f"--tavern-global-cfg={config_path}",
     ]
 
@@ -163,8 +168,16 @@ def cli(
     if test_type != TestType.ALL:
         pytest_args.extend(["-m", test_type])
 
-    # Run pytest with our arguments
-    sys.exit(pytest.main(pytest_args))
+    # Create result capture
+    capture = ResultCapture()
+
+    # Run pytest with capture
+    exit_code = pytest.main(pytest_args, plugins=[capture])
+
+    # Print formatted results
+    click.echo(format_results(capture))
+
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
