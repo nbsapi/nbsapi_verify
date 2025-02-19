@@ -1,6 +1,0 @@
-variables:
-  host: http://localhost:8000
-  password: testpass
-  solution_id: 1
-  user_id: 9
-  username: testuser
