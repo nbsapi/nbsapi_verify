@@ -1,10 +1,15 @@
+# ruff: noqa: UP007
+
 import sys
 from enum import Enum
 from pathlib import Path
+from typing import Optional
 
 import click
 import pytest
 import yaml
+
+from .formatting import ResultCapture, format_results
 
 
 class TestType(str, Enum):
@@ -34,7 +39,7 @@ def get_config_locations() -> list[Path]:
     ]
 
 
-def find_config() -> Path | None:
+def find_config() -> Optional[Path]:
     """Find existing config file in priority order."""
     for path in get_config_locations():
         if path.exists():
@@ -42,7 +47,7 @@ def find_config() -> Path | None:
     return None
 
 
-def get_config_path(config_dir: str | None = None) -> Path:
+def get_config_path(config_dir: Optional[str] = None) -> Path:
     """Get the path where config should be written/read.
 
     Args:
@@ -91,11 +96,11 @@ def get_config_path(config_dir: str | None = None) -> Path:
 )
 def cli(
     generate: bool,
-    config_dir: str | None,
-    host: str | None,
+    config_dir: Optional[str],
+    host: Optional[str],
     testid: int,
-    username: str | None,
-    password: str | None,
+    username: Optional[str],
+    password: Optional[str],
     solution: int,
     test_type: str,
 ):
@@ -155,7 +160,10 @@ def cli(
     # Prepare pytest arguments
     pytest_args = [
         str(test_dir),
-        "-v",
+        "-q",  # Quiet mode
+        "--tb=no",  # Disable traceback
+        "--no-header",  # Remove header
+        "--no-summary",  # Remove summary
         f"--tavern-global-cfg={config_path}",
     ]
 
@@ -163,8 +171,16 @@ def cli(
     if test_type != TestType.ALL:
         pytest_args.extend(["-m", test_type])
 
-    # Run pytest with our arguments
-    sys.exit(pytest.main(pytest_args))
+    # Create result capture
+    capture = ResultCapture()
+
+    # Run pytest with capture
+    exit_code = pytest.main(pytest_args, plugins=[capture])
+
+    # Print formatted results
+    click.echo(format_results(capture))
+
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
