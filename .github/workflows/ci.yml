@@ -25,6 +25,9 @@ jobs:
       - name: Install the project and deps
         run: uv sync --all-extras --dev
 
+      - name: Run tests
+        run: uv run pytest
+
       - name: Build wheel
         run: uv build --no-sources --wheel  -o dist
 

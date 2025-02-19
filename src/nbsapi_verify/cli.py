@@ -1,6 +1,9 @@
+# ruff: noqa: UP007
+
 import sys
 from enum import Enum
 from pathlib import Path
+from typing import Optional
 
 import click
 import pytest
@@ -36,7 +39,7 @@ def get_config_locations() -> list[Path]:
     ]
 
 
-def find_config() -> Path | None:
+def find_config() -> Optional[Path]:
     """Find existing config file in priority order."""
     for path in get_config_locations():
         if path.exists():
@@ -44,7 +47,7 @@ def find_config() -> Path | None:
     return None
 
 
-def get_config_path(config_dir: str | None = None) -> Path:
+def get_config_path(config_dir: Optional[str] = None) -> Path:
     """Get the path where config should be written/read.
 
     Args:
@@ -93,11 +96,11 @@ def get_config_path(config_dir: str | None = None) -> Path:
 )
 def cli(
     generate: bool,
-    config_dir: str | None,
-    host: str | None,
+    config_dir: Optional[str],
+    host: Optional[str],
     testid: int,
-    username: str | None,
-    password: str | None,
+    username: Optional[str],
+    password: Optional[str],
     solution: int,
     test_type: str,
 ):

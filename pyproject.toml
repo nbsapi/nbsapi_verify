@@ -22,6 +22,12 @@ Tracker = "https://github.com/nbsapi/nbsapi_verify/issues"
 [project.scripts]
 nbsapi_verify = "nbsapi_verify.cli:cli"
 
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -40,6 +46,8 @@ filterwarnings = [
     "ignore:cannot collect test class 'TestType' because it has a __init__ constructor",
     "ignore:Can't validate argument 'spatial_index'; can't locate any SQLAlchemy dialect named 'spatial'"
 ]
+testpaths = ["tests"]  # Only collect tests from the top-level tests directory
+norecursedirs = ["src"]  # Explicitly exclude src directory from test collection
 
 [tool.ruff]
 exclude = [

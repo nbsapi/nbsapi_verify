@@ -193,11 +193,18 @@ dependencies = [
     { name = "tavern" },
 ]
 
+[package.optional-dependencies]
+test = [
+    { name = "pytest" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.1.8" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0" },
     { name = "tavern", specifier = ">=2.11.0" },
 ]
+provides-extras = ["test"]
 
 [[package]]
 name = "packaging"
