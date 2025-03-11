@@ -9,10 +9,34 @@
 
 #### Using [uvx](https://docs.astral.sh/uv/guides/tools/)
 `uvx nbsapi_verify --help`
+
 ### Installation (permanent, on `$PATH`)
 If you would prefer the tool to be **installed** on your `PATH` you can run:
 
 `pipx install nbsapi_verify` or `uv tool install nbsapi_verify`. You can then run `nbsapi_verify` without prefixes.
+
+### Installation as a _package_
+You can also install the package using your preferred Python package manager:
+
+#### Using pip
+```shell
+pip install nbsapi_verify
+```
+
+#### Using uv
+```shell
+uv add nbsapi_verify
+```
+
+#### Using poetry
+```shell
+poetry add nbsapi_verify
+```
+
+After installation, you can run the tool using the installed script:
+```shell
+nbsapi_verify --help
+```
 
 ### Usage
 `nbsapi_verify` requires a small amount of configuration:
