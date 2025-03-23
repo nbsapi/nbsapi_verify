@@ -52,7 +52,7 @@ nbsapi_verify --help
 In order to test your API while locally developing, that command might look like:
 
 ```shell
-nbsinfra_verify --generate \
+nbsapi_verify --generate \
     --host http://localhost:8000 \
     --test-type all
     --username testuser \
@@ -64,10 +64,10 @@ nbsinfra_verify --generate \
 If the command completes sucessfully, you can run the verification tool:
 
 ```shell
-nbsinfra_verify --config-dir ~
+nbsapi_verify --config-dir ~
 ```
 
 When all tests pass, your API implementation is conformant to the `NbsAPI` specification!
 
 ## Help
-`nbsinfra_verify --help`
+`nbsapi_verify --help`
