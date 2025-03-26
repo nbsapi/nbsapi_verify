@@ -148,6 +148,23 @@ def cli(
                 err=True,
             )
             sys.exit(1)
+            
+    # Load config to check available test types
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
+        
+    # Check for test type mismatch
+    has_auth_config = "username" in config.get("variables", {}) and "password" in config.get("variables", {})
+    
+    # Detect test type mismatch
+    if test_type in (TestType.AUTH, TestType.ALL) and not has_auth_config:
+        click.echo(
+            f"Error: Test type '{test_type}' requested but auth configuration is missing.\n"
+            "Auth tests require 'username' and 'password' in the configuration.\n"
+            "Please regenerate the configuration with --username and --password parameters.",
+            err=True,
+        )
+        sys.exit(1)
 
     # Get the package's test directory
     package_dir = Path(__file__).parent
@@ -155,6 +172,54 @@ def cli(
 
     if not test_dir.exists():
         click.echo(f"Error: Test directory not found at {test_dir}", err=True)
+        sys.exit(1)
+
+    # Verify that requested test types have matching test files
+    import glob
+    
+    # Get all test files and check for their markers
+    test_files = glob.glob(str(test_dir / "*.tavern.yaml"))
+    
+    # Check if there are any test files with requested markers
+    has_auth_tests = False
+    has_public_tests = False
+    
+    for test_file in test_files:
+        with open(test_file) as f:
+            content = f.read()
+            if "marks:\n- auth" in content:
+                has_auth_tests = True
+            if "marks:\n- public" in content:
+                has_public_tests = True
+    
+    # Verify requested test type has matching test files
+    if test_type == TestType.AUTH and not has_auth_tests:
+        click.echo(
+            f"Error: Test type '{test_type}' requested but no auth test files found.\n"
+            "Make sure auth test files are generated and properly marked.",
+            err=True,
+        )
+        sys.exit(1)
+    
+    if test_type == TestType.PUBLIC and not has_public_tests:
+        click.echo(
+            f"Error: Test type '{test_type}' requested but no public test files found.\n"
+            "Make sure public test files are generated and properly marked.",
+            err=True,
+        )
+        sys.exit(1)
+        
+    if test_type == TestType.ALL and not (has_auth_tests and has_public_tests):
+        missing = []
+        if not has_auth_tests:
+            missing.append("auth")
+        if not has_public_tests:
+            missing.append("public")
+        click.echo(
+            f"Error: Test type '{test_type}' requested but some test types are missing: {', '.join(missing)}.\n"
+            "Make sure all test types are generated before running 'all' tests.",
+            err=True,
+        )
         sys.exit(1)
 
     # Prepare pytest arguments
