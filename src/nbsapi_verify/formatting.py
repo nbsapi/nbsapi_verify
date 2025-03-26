@@ -1,3 +1,8 @@
+import datetime as dt
+import os
+from datetime import datetime
+from typing import Any, Optional
+
 from _pytest.reports import TestReport
 
 
@@ -7,6 +12,7 @@ class ResultCapture:
         self.failed: list[dict[str, str]] = []
         self.skipped: list[str] = []
         self.total_duration: float = 0.0
+        self.start_time: datetime = datetime.now(tz=dt.timezone.utc)
 
     def pytest_runtest_logreport(self, report: TestReport):
         if report.when == "call":  # Only process the test result, not setup/teardown
@@ -35,7 +41,7 @@ def format_results(capture: ResultCapture) -> str:
     failures = False
 
     # Summary line
-    total = len(capture.passed) + len(capture.failed) + len(capture.skipped)
+    _ = len(capture.passed) + len(capture.failed) + len(capture.skipped)
     output.append(f"\nNbSAPI Conformance Test Summary ({capture.total_duration:.1f}s)")
     output.append("=" * 40)
 
@@ -74,3 +80,45 @@ def format_results(capture: ResultCapture) -> str:
         )
 
     return "\n".join(output)
+
+
+def format_json(capture: ResultCapture) -> dict[str, Any]:
+    """Format test results as a JSON-serializable dictionary."""
+    total = len(capture.passed) + len(capture.failed) + len(capture.skipped)
+
+    return {
+        "summary": {
+            "total": total,
+            "passed": len(capture.passed),
+            "failed": len(capture.failed),
+            "skipped": len(capture.skipped),
+            "duration": round(capture.total_duration, 1),
+            "timestamp": capture.start_time.strftime("%l:%M%p %Z on %b %d, %Y"),
+        },
+        "tests": {
+            "passed": [test_id for test_id in capture.passed],
+            "failed": capture.failed,
+            "skipped": [test_id for test_id in capture.skipped],
+        },
+        "is_conformant": len(capture.failed) == 0,
+    }
+
+
+def render_html(
+    capture: ResultCapture, json_data: Optional[dict[str, Any]] = None
+) -> str:
+    """Render test results as HTML using a Jinja2 template."""
+    from jinja2 import Template
+
+    # Use the JSON data if provided, otherwise generate it
+    data = json_data if json_data is not None else format_json(capture)
+
+    # Get the HTML template
+    template_path = os.path.join(os.path.dirname(__file__), "templates", "report.html")
+
+    with open(template_path) as f:
+        template_content = f.read()
+
+    # Render the template
+    template = Template(template_content)
+    return template.render(data=data)
